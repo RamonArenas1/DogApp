@@ -1,16 +1,15 @@
 package com.example.ramon.tareafinal;
 
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.GridLayoutManager;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.ramon.tareafinal.Adapter.BreedAdapter;
-import com.example.ramon.tareafinal.Adapter.ImageAdapter;
 import com.example.ramon.tareafinal.DogAPI.Constants;
 import com.example.ramon.tareafinal.DogAPI.RetrofitAdapter;
 import com.example.ramon.tareafinal.DogAPI.Service;
@@ -28,51 +27,57 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class DogsGallery extends AppCompatActivity {
+public class SubBreeds extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
-    private ArrayList<Dog> dogs;
-    private ImageAdapter mAdapter;
+    private ArrayList<Breed> subBreeds;
+    private BreedAdapter mAdapter;
     private String breed;
-    private String subBreed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dogs_gallery);
+        setContentView(R.layout.activity_sub_breeds);
 
         Bundle bundle = this.getIntent().getExtras();
-
         breed = bundle.getString("stringBreed");
-        Log.i(Constants.TAG,breed);
 
-        subBreed = bundle.getString("stringSubBreed");
-        Log.i(Constants.TAG,subBreed);
-
-        buildGallery();
+        buildRecyclerView();
+        changeActivity();
     }
 
-    private void buildGallery() {
-        mRecyclerView = findViewById(R.id.imageRecycler);
-        dogs = new ArrayList<>();
+    private void changeActivity() {
+        mAdapter.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String subBreed = subBreeds.get(mRecyclerView.getChildAdapterPosition(view)).getName();
 
-        final GridLayoutManager layoutManager = new GridLayoutManager(this, 4);
-        mRecyclerView.setLayoutManager(layoutManager);
+                Intent intent = new Intent(SubBreeds.this, DogsGallery.class);
+                intent.putExtra("stringBreed",breed);
+                intent.putExtra("stringSubBreed",subBreed);
 
-        mAdapter = new ImageAdapter(this);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void buildRecyclerView() {
+        mRecyclerView = findViewById(R.id.subBreeds);
+        subBreeds = new ArrayList<>();
+
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        mAdapter = new BreedAdapter();
         mRecyclerView.setAdapter(mAdapter);
 
-        if(subBreed.contains("all")) {
-            addElementsBreed();
-        }else{
-            addElementsSubBreed();
-        }
+        addElements();
     }
 
-    private void addElementsSubBreed() {
+    private void addElements() {
         RetrofitAdapter restApiAdapter = new RetrofitAdapter();
         Service service = restApiAdapter.getCharacterService();
-        retrofit2.Call<JsonObject> call = service.getBySubBreed(breed,subBreed);
+        retrofit2.Call<JsonObject> call = service.listAllSubBreeds(breed);
 
         call.enqueue(new Callback<JsonObject>() {
             @Override
@@ -81,8 +86,11 @@ public class DogsGallery extends AppCompatActivity {
                     assert response.body() != null;
                     JSONArray jsonArray = new JSONArray(response.body().getAsJsonArray("message").toString());
 
+                    subBreeds.add(new Breed("all"));
+
+
                     parseBreed(jsonArray);
-                    mAdapter.addToList(dogs);
+                    mAdapter.addToList(subBreeds);
 
                 }catch (JSONException e){
                     e.printStackTrace();
@@ -107,42 +115,15 @@ public class DogsGallery extends AppCompatActivity {
     }
 
     private void showErrorPage() {
-        Intent intent = new Intent(DogsGallery.this,ErrorActivity.class);
+        Intent intent = new Intent(SubBreeds.this,ErrorActivity.class);
         startActivity(intent);
-    }
-
-    private void addElementsBreed() {
-        RetrofitAdapter restApiAdapter = new RetrofitAdapter();
-        Service service = restApiAdapter.getCharacterService();
-        retrofit2.Call<JsonObject> call = service.getByBreed(breed);
-
-        call.enqueue(new Callback<JsonObject>() {
-            @Override
-            public void onResponse(Call<JsonObject> call, Response<JsonObject> response) {
-                try {
-                    assert response.body() != null;
-                    JSONArray jsonArray = new JSONArray(response.body().getAsJsonArray("message").toString());
-
-                    parseBreed(jsonArray);
-                    mAdapter.addToList(dogs);
-
-                }catch (JSONException e){
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<JsonObject> call, Throwable t) {
-
-            }
-        });
     }
 
     private void parseBreed(JSONArray jsonArray) throws JSONException {
         for (int i = 0; i < jsonArray.length(); i++){
-            String image = jsonArray.getString(i);
-            dogs.add(new Dog(image));
-            Log.i(Constants.TAG,image);
+            String subBreed = jsonArray.getString(i);
+            subBreeds.add(new Breed(subBreed));
+            Log.i(Constants.TAG,subBreed);
 
         }
     }

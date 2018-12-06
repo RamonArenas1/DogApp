@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/itemRandom"
+        android:checkable="true"
+        android:enabled="true"
+        android:icon="@drawable/question_mark"
+        android:title="@string/random" />
+    <item
+        android:id="@+id/itemBreeds"
+        android:checkable="true"
+        android:enabled="true"
+        android:icon="@drawable/animal_paw_print"
+        android:title="@string/breeds" />
+    <item
+        android:id="@+id/itemFavorites"
+        android:checkable="true"
+        android:enabled="true"
+        android:icon="@drawable/star"
+        android:title="@string/favorites" />
+
+</menu>

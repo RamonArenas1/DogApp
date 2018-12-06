@@ -19,4 +19,7 @@ public interface Service{
 
     @GET(Constants.BY_BREED + "{breed}/{subBreed}/images")
     Call<JsonObject> getBySubBreed(@Path("breed") String breed, @Path("subBreed") String subBreed);
+
+    @GET(Constants.BY_BREED + "{breed}/list")
+    Call<JsonObject> listAllSubBreeds(@Path("breed") String breed);
 }

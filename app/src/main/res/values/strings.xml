@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">DogApp</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="random_dogs">Random Dogs!!!</string>
+    <string name="random">Random</string>
+    <string name="breeds">Breeds</string>
+    <string name="favorites">Favorites</string>
+    <string name="soon">Soon</string>
+    <string name="error_m">Upss... Something went wrong</string>
+    <string name="errror">ERRROR</string>
+    <string name="error">ERROR</string>
 </resources>
